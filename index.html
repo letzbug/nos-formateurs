@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formateurs UniPop</title>
+
+  <style>
+    :root{
+      --bg:#eef5ff;
+      --card:#ffffff;
+      --blue:#0066ff;
+      --blue2:#00a6ff;
+      --text:#132033;
+      --muted:#6b7a90;
+      --line:rgba(0,70,160,.14);
+      --shadow:0 18px 45px rgba(0,50,120,.12);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(0,166,255,.25), transparent 35%),
+        linear-gradient(135deg,#eef5ff,#ffffff);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:32px 18px;
+    }
+
+    header{
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      color:white;
+      padding:34px;
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      margin-bottom:24px;
+    }
+
+    header h1{
+      margin:0 0 10px;
+      font-size:clamp(2rem,5vw,4rem);
+      line-height:1;
+    }
+
+    header p{
+      margin:0;
+      opacity:.9;
+      font-size:1.05rem;
+    }
+
+    .tools{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:22px;
+    }
+
+    input, select{
+      flex:1;
+      min-width:220px;
+      padding:14px 16px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      font-size:1rem;
+      background:white;
+      outline:none;
+      box-shadow:0 8px 22px rgba(0,50,120,.06);
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:14px;
+      margin-bottom:22px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.75);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+
+    .stat strong{
+      display:block;
+      font-size:2rem;
+      color:var(--blue);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:16px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:var(--shadow);
+      transition:.2s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-4px);
+    }
+
+    .name{
+      font-size:1.25rem;
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .meta{
+      color:var(--muted);
+      font-size:.95rem;
+      margin-bottom:12px;
+      line-height:1.45;
+    }
+
+    .tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+
+    .tag{
+      font-size:.78rem;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef5ff;
+      color:#0050c8;
+      border:1px solid rgba(0,102,255,.15);
+    }
+
+    .course{
+      margin-top:14px;
+      padding-top:12px;
+      border-top:1px solid var(--line);
+      font-size:.9rem;
+      color:var(--muted);
+    }
+
+    .course b{
+      color:var(--text);
+    }
+
+    .empty{
+      padding:30px;
+      text-align:center;
+      background:white;
+      border-radius:var(--radius);
+      color:var(--muted);
+      box-shadow:var(--shadow);
+    }
+
+    footer{
+      margin-top:28px;
+      color:var(--muted);
+      text-align:center;
+      font-size:.85rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Formateurs</h1>
+      <p>Liste automatique extraite de la JSON des formations.</p>
+    </header>
+
+    <div class="tools">
+      <input id="search" type="search" placeholder="Rechercher un formateur, une matière, une langue…" />
+      <select id="sort">
+        <option value="name">Trier par nom</option>
+        <option value="courses">Trier par nombre de cours</option>
+      </select>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <strong id="totalTeachers">0</strong>
+        Formateurs
+      </div>
+      <div class="stat">
+        <strong id="totalCourses">0</strong>
+        Cours analysés
+      </div>
+      <div class="stat">
+        <strong id="visibleTeachers">0</strong>
+        Résultats affichés
+      </div>
+    </div>
+
+    <main id="grid" class="grid"></main>
+
+    <footer>
+      Données chargées depuis <code>data/trainings.json</code>
+    </footer>
+  </div>
+
+  <script>
+    const DATA_URL = "data/trainings.json";
+
+    const grid = document.getElementById("grid");
+    const search = document.getElementById("search");
+    const sort = document.getElementById("sort");
+
+    const totalTeachers = document.getElementById("totalTeachers");
+    const totalCourses = document.getElementById("totalCourses");
+    const visibleTeachers = document.getElementById("visibleTeachers");
+
+    let teachers = [];
+    let trainings = [];
+
+    function clean(value){
+      return value ? String(value).trim() : "";
+    }
+
+    function fullName(t){
+      return `${clean(t.prenom)} ${clean(t.nom)}`.trim();
+    }
+
+    function uniq(arr){
+      return [...new Set(arr.filter(Boolean))];
+    }
+
+    async function loadData(){
+      try{
+        const response = await fetch(DATA_URL, { cache: "no-store" });
+        if(!response.ok) throw new Error("JSON non trouvée");
+
+        trainings = await response.json();
+
+        const map = new Map();
+
+        trainings.forEach(course => {
+          const enseignants = Array.isArray(course.enseignants) ? course.enseignants : [];
+
+          enseignants.forEach(enseignant => {
+            const name = fullName(enseignant);
+            if(!name) return;
+
+            const key = name.toLowerCase();
+
+            if(!map.has(key)){
+              map.set(key, {
+                name,
+                prenom: clean(enseignant.prenom),
+                nom: clean(enseignant.nom),
+                presentation: clean(enseignant.presentation),
+                courses: [],
+                categories: [],
+                matieres: [],
+                langues: [],
+                formats: []
+              });
+            }
+
+            const item = map.get(key);
+
+            item.courses.push({
+              title: clean(course.intitule),
+              date: clean(course.dateDebut),
+              matiere: clean(course.matiereNom),
+              categorie: clean(course.categorieNom),
+              langue: clean(course.langueCoursNom),
+              format: clean(course.format),
+              inscrits: course.nbInscrits,
+              places: course.nbPlaces
+            });
+
+            item.categories.push(clean(course.categorieNom));
+            item.matieres.push(clean(course.matiereNom));
+            item.langues.push(clean(course.langueCoursNom));
+            item.formats.push(clean(course.format));
+          });
+        });
+
+        teachers = [...map.values()].map(t => ({
+          ...t,
+          categories: uniq(t.categories),
+          matieres: uniq(t.matieres),
+          langues: uniq(t.langues),
+          formats: uniq(t.formats)
+        }));
+
+        render();
+      }catch(error){
+        grid.innerHTML = `
+          <div class="empty">
+            Impossible de charger <b>data/trainings.json</b>.<br>
+            Vérifie que la page GitHub est bien dans le même repo que le dossier <b>data</b>.
+          </div>
+        `;
+        console.error(error);
+      }
+    }
+
+    function render(){
+      const q = search.value.toLowerCase().trim();
+
+      let filtered = teachers.filter(t => {
+        const text = [
+          t.name,
+          t.categories.join(" "),
+          t.matieres.join(" "),
+          t.langues.join(" "),
+          t.formats.join(" "),
+          t.courses.map(c => c.title).join(" ")
+        ].join(" ").toLowerCase();
+
+        return text.includes(q);
+      });
+
+      if(sort.value === "courses"){
+        filtered.sort((a,b) => b.courses.length - a.courses.length || a.name.localeCompare(b.name));
+      }else{
+        filtered.sort((a,b) => a.nom.localeCompare(b.nom) || a.prenom.localeCompare(b.prenom));
+      }
+
+      totalTeachers.textContent = teachers.length;
+      totalCourses.textContent = trainings.length;
+      visibleTeachers.textContent = filtered.length;
+
+      if(!filtered.length){
+        grid.innerHTML = `<div class="empty">Aucun formateur trouvé.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(t => {
+        const latestCourses = t.courses.slice(0,3).map(c => `
+          <div class="course">
+            <b>${escapeHtml(c.title)}</b><br>
+            ${escapeHtml(c.date)} · ${escapeHtml(c.matiere)} · ${escapeHtml(c.langue)}
+          </div>
+        `).join("");
+
+        return `
+          <article class="card">
+            <div class="name">${escapeHtml(t.name)}</div>
+
+            <div class="meta">
+              ${t.courses.length} cours<br>
+              ${escapeHtml(t.matieres.slice(0,3).join(", "))}
+            </div>
+
+            <div class="tags">
+              ${t.langues.map(l => `<span class="tag">${escapeHtml(l)}</span>`).join("")}
+              ${t.formats.map(f => `<span class="tag">${escapeHtml(f)}</span>`).join("")}
+            </div>
+
+            ${latestCourses}
+
+            ${t.presentation ? `
+              <div class="course">
+                <a href="${escapeAttribute(t.presentation)}" target="_blank" rel="noopener">Présentation externe</a>
+              </div>
+            ` : ""}
+          </article>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(str){
+      return String(str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function escapeAttribute(str){
+      return escapeHtml(str).replaceAll("`","");
+    }
+
+    search.addEventListener("input", render);
+    sort.addEventListener("change", render);
+
+    loadData();
+  </script>
+</body>
+</html>
