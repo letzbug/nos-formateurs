@@ -64,7 +64,7 @@
       margin-bottom:22px;
     }
 
-    input, select{
+    input, select, button{
       flex:1;
       min-width:220px;
       padding:14px 16px;
@@ -74,6 +74,18 @@
       background:white;
       outline:none;
       box-shadow:0 8px 22px rgba(0,50,120,.06);
+    }
+
+    button{
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+      border:none;
+    }
+
+    button:hover{
+      transform:translateY(-2px);
     }
 
     .stats{
@@ -172,6 +184,43 @@
       text-align:center;
       font-size:.85rem;
     }
+
+    @media print{
+      body{
+        background:white;
+      }
+
+      header,
+      .tools,
+      footer{
+        display:none;
+      }
+
+      .wrap{
+        max-width:none;
+        padding:0;
+      }
+
+      .stats{
+        display:none;
+      }
+
+      .grid{
+        display:block;
+      }
+
+      .card{
+        break-inside:avoid;
+        box-shadow:none;
+        border:1px solid #ccc;
+        border-radius:10px;
+        margin-bottom:12px;
+      }
+
+      .card:hover{
+        transform:none;
+      }
+    }
   </style>
 </head>
 
@@ -184,10 +233,19 @@
 
     <div class="tools">
       <input id="search" type="search" placeholder="Rechercher un formateur, une matière, une langue…" />
+
+      <select id="filterOrg">
+        <option value="all">Tous</option>
+        <option value="UNIPOP">UniPop</option>
+        <option value="VIVRE">Vivre Ensemble</option>
+      </select>
+
       <select id="sort">
         <option value="name">Trier par nom</option>
         <option value="courses">Trier par nombre de cours</option>
       </select>
+
+      <button id="printBtn">🖨️ Imprimer la liste</button>
     </div>
 
     <div class="stats">
@@ -208,16 +266,18 @@
     <main id="grid" class="grid"></main>
 
     <footer>
-      Données chargées depuis <code>data/trainings.json</code>
+      Données chargées depuis <code>trainings.json</code>
     </footer>
   </div>
 
   <script>
-    const DATA_URL = "https://raw.githubusercontent.com/letzbug/franks_magic/f2390030c96e8fef5bd6f9d7bc7a29be2971c488/data/trainings.json";
+    const DATA_URL = "https://cdn.jsdelivr.net/gh/letzbug/franks_magic@f2390030c96e8fef5bd6f9d7bc7a29be2971c488/data/trainings.json";
 
     const grid = document.getElementById("grid");
     const search = document.getElementById("search");
     const sort = document.getElementById("sort");
+    const filterOrg = document.getElementById("filterOrg");
+    const printBtn = document.getElementById("printBtn");
 
     const totalTeachers = document.getElementById("totalTeachers");
     const totalCourses = document.getElementById("totalCourses");
@@ -238,6 +298,16 @@
       return [...new Set(arr.filter(Boolean))];
     }
 
+    function getOrganiser(course){
+      return clean(
+        course.organiser?.nom ||
+        course.organiser?.code ||
+        course.organisateurNom ||
+        course.organisateur ||
+        ""
+      );
+    }
+
     async function loadData(){
       try{
         const response = await fetch(DATA_URL, { cache: "no-store" });
@@ -249,6 +319,7 @@
 
         trainings.forEach(course => {
           const enseignants = Array.isArray(course.enseignants) ? course.enseignants : [];
+          const organiser = getOrganiser(course);
 
           enseignants.forEach(enseignant => {
             const name = fullName(enseignant);
@@ -266,7 +337,8 @@
                 categories: [],
                 matieres: [],
                 langues: [],
-                formats: []
+                formats: [],
+                organisers: []
               });
             }
 
@@ -279,6 +351,7 @@
               categorie: clean(course.categorieNom),
               langue: clean(course.langueCoursNom),
               format: clean(course.format),
+              organiser: organiser,
               inscrits: course.nbInscrits,
               places: course.nbPlaces
             });
@@ -287,6 +360,7 @@
             item.matieres.push(clean(course.matiereNom));
             item.langues.push(clean(course.langueCoursNom));
             item.formats.push(clean(course.format));
+            item.organisers.push(organiser);
           });
         });
 
@@ -295,15 +369,16 @@
           categories: uniq(t.categories),
           matieres: uniq(t.matieres),
           langues: uniq(t.langues),
-          formats: uniq(t.formats)
+          formats: uniq(t.formats),
+          organisers: uniq(t.organisers)
         }));
 
         render();
       }catch(error){
         grid.innerHTML = `
           <div class="empty">
-            Impossible de charger <b>data/trainings.json</b>.<br>
-            Vérifie que la page GitHub est bien dans le même repo que le dossier <b>data</b>.
+            Impossible de charger la JSON.<br>
+            Erreur: <b>${escapeHtml(error.message)}</b>
           </div>
         `;
         console.error(error);
@@ -312,6 +387,7 @@
 
     function render(){
       const q = search.value.toLowerCase().trim();
+      const org = filterOrg.value;
 
       let filtered = teachers.filter(t => {
         const text = [
@@ -320,10 +396,19 @@
           t.matieres.join(" "),
           t.langues.join(" "),
           t.formats.join(" "),
+          t.organisers.join(" "),
           t.courses.map(c => c.title).join(" ")
         ].join(" ").toLowerCase();
 
-        return text.includes(q);
+        const matchesSearch = text.includes(q);
+
+        const matchesOrg =
+          org === "all" ||
+          t.courses.some(c =>
+            String(c.organiser || "").toUpperCase().includes(org)
+          );
+
+        return matchesSearch && matchesOrg;
       });
 
       if(sort.value === "courses"){
@@ -342,12 +427,19 @@
       }
 
       grid.innerHTML = filtered.map(t => {
-        const latestCourses = t.courses.slice(0,3).map(c => `
-          <div class="course">
-            <b>${escapeHtml(c.title)}</b><br>
-            ${escapeHtml(c.date)} · ${escapeHtml(c.matiere)} · ${escapeHtml(c.langue)}
-          </div>
-        `).join("");
+        const latestCourses = t.courses
+          .filter(c => {
+            if(org === "all") return true;
+            return String(c.organiser || "").toUpperCase().includes(org);
+          })
+          .slice(0,5)
+          .map(c => `
+            <div class="course">
+              <b>${escapeHtml(c.title)}</b><br>
+              ${escapeHtml(c.date)} · ${escapeHtml(c.matiere)} · ${escapeHtml(c.langue)}<br>
+              <small>${escapeHtml(c.organiser)}</small>
+            </div>
+          `).join("");
 
         return `
           <article class="card">
@@ -355,12 +447,12 @@
 
             <div class="meta">
               ${t.courses.length} cours<br>
-              ${escapeHtml(t.matieres.slice(0,3).join(", "))}
+              ${escapeHtml(t.matieres.slice(0,4).join(", "))}
             </div>
 
             <div class="tags">
+              ${t.organisers.map(o => `<span class="tag">${escapeHtml(o)}</span>`).join("")}
               ${t.langues.map(l => `<span class="tag">${escapeHtml(l)}</span>`).join("")}
-              ${t.formats.map(f => `<span class="tag">${escapeHtml(f)}</span>`).join("")}
             </div>
 
             ${latestCourses}
@@ -390,6 +482,11 @@
 
     search.addEventListener("input", render);
     sort.addEventListener("change", render);
+    filterOrg.addEventListener("change", render);
+
+    printBtn.addEventListener("click", () => {
+      window.print();
+    });
 
     loadData();
   </script>
