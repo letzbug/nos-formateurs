@@ -1,494 +1,568 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formateurs UniPop</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <style>
-    :root{
-      --bg:#eef5ff;
-      --card:#ffffff;
-      --blue:#0066ff;
-      --blue2:#00a6ff;
-      --text:#132033;
-      --muted:#6b7a90;
-      --line:rgba(0,70,160,.14);
-      --shadow:0 18px 45px rgba(0,50,120,.12);
-      --radius:22px;
-    }
+<title>Formateurs</title>
 
-    *{box-sizing:border-box}
+<style>
 
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(0,166,255,.25), transparent 35%),
-        linear-gradient(135deg,#eef5ff,#ffffff);
-      color:var(--text);
-      min-height:100vh;
-    }
+:root{
+  --blue:#0066ff;
+  --blue2:#00a6ff;
+  --bg:#eef5ff;
+  --card:#ffffff;
+  --text:#132033;
+  --muted:#6b7a90;
+  --line:rgba(0,70,160,.14);
+  --shadow:0 18px 45px rgba(0,50,120,.12);
+  --radius:22px;
+}
 
-    .wrap{
-      max-width:1200px;
-      margin:0 auto;
-      padding:32px 18px;
-    }
+*{
+  box-sizing:border-box;
+}
 
-    header{
-      background:linear-gradient(135deg,var(--blue),var(--blue2));
-      color:white;
-      padding:34px;
-      border-radius:30px;
-      box-shadow:var(--shadow);
-      margin-bottom:24px;
-    }
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(0,166,255,.20), transparent 35%),
+    linear-gradient(135deg,#eef5ff,#ffffff);
+  color:var(--text);
+}
 
-    header h1{
-      margin:0 0 10px;
-      font-size:clamp(2rem,5vw,4rem);
-      line-height:1;
-    }
+.wrap{
+  max-width:1300px;
+  margin:auto;
+  padding:28px 18px;
+}
 
-    header p{
-      margin:0;
-      opacity:.9;
-      font-size:1.05rem;
-    }
+header{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  padding:32px;
+  border-radius:30px;
+  margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
 
-    .tools{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:22px;
-    }
+header h1{
+  margin:0 0 8px;
+  font-size:clamp(2rem,5vw,4rem);
+}
 
-    input, select, button{
-      flex:1;
-      min-width:220px;
-      padding:14px 16px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      font-size:1rem;
-      background:white;
-      outline:none;
-      box-shadow:0 8px 22px rgba(0,50,120,.06);
-    }
+header p{
+  margin:0;
+  opacity:.9;
+}
 
-    button{
-      background:linear-gradient(135deg,var(--blue),var(--blue2));
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
-      border:none;
-    }
+.tools{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
 
-    button:hover{
-      transform:translateY(-2px);
-    }
+input,
+select,
+button{
+  flex:1;
+  min-width:220px;
+  padding:14px 16px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  font-size:1rem;
+  background:white;
+  box-shadow:0 8px 22px rgba(0,50,120,.06);
+}
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-      gap:14px;
-      margin-bottom:22px;
-    }
+button{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  border:none;
+}
 
-    .stat{
-      background:rgba(255,255,255,.75);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(10px);
-    }
+button:hover{
+  transform:translateY(-2px);
+}
 
-    .stat strong{
-      display:block;
-      font-size:2rem;
-      color:var(--blue);
-    }
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px;
+  margin-bottom:24px;
+}
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-      gap:16px;
-    }
+.stat{
+  background:white;
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow);
+}
 
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:20px;
-      box-shadow:var(--shadow);
-      transition:.2s ease;
-    }
+.stat strong{
+  display:block;
+  font-size:2rem;
+  color:var(--blue);
+}
 
-    .card:hover{
-      transform:translateY(-4px);
-    }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:18px;
+}
 
-    .name{
-      font-size:1.25rem;
-      font-weight:800;
-      margin-bottom:8px;
-    }
+.card{
+  background:white;
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--line);
+  transition:.2s;
+}
 
-    .meta{
-      color:var(--muted);
-      font-size:.95rem;
-      margin-bottom:12px;
-      line-height:1.45;
-    }
+.card:hover{
+  transform:translateY(-4px);
+}
 
-    .tags{
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-    }
+.name{
+  font-size:1.3rem;
+  font-weight:800;
+  margin-bottom:10px;
+}
 
-    .tag{
-      font-size:.78rem;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#eef5ff;
-      color:#0050c8;
-      border:1px solid rgba(0,102,255,.15);
-    }
+.meta{
+  color:var(--muted);
+  margin-bottom:14px;
+  line-height:1.5;
+}
 
-    .course{
-      margin-top:14px;
-      padding-top:12px;
-      border-top:1px solid var(--line);
-      font-size:.9rem;
-      color:var(--muted);
-    }
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:14px;
+}
 
-    .course b{
-      color:var(--text);
-    }
+.tag{
+  font-size:.78rem;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#eef5ff;
+  color:#0050c8;
+}
 
-    .empty{
-      padding:30px;
-      text-align:center;
-      background:white;
-      border-radius:var(--radius);
-      color:var(--muted);
-      box-shadow:var(--shadow);
-    }
+.course{
+  border-top:1px solid var(--line);
+  padding-top:12px;
+  margin-top:12px;
+  font-size:.9rem;
+  color:var(--muted);
+}
 
-    footer{
-      margin-top:28px;
-      color:var(--muted);
-      text-align:center;
-      font-size:.85rem;
-    }
+.course b{
+  color:var(--text);
+}
 
-    @media print{
-      body{
-        background:white;
-      }
+footer{
+  text-align:center;
+  margin-top:30px;
+  color:var(--muted);
+  font-size:.85rem;
+}
 
-      header,
-      .tools,
-      footer{
-        display:none;
-      }
+.empty{
+  background:white;
+  padding:30px;
+  border-radius:22px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
 
-      .wrap{
-        max-width:none;
-        padding:0;
-      }
+@media print{
 
-      .stats{
-        display:none;
-      }
+  body{
+    background:white;
+  }
 
-      .grid{
-        display:block;
-      }
+  header,
+  .tools,
+  footer,
+  .stats{
+    display:none;
+  }
 
-      .card{
-        break-inside:avoid;
-        box-shadow:none;
-        border:1px solid #ccc;
-        border-radius:10px;
-        margin-bottom:12px;
-      }
+  .grid{
+    display:block;
+  }
 
-      .card:hover{
-        transform:none;
-      }
-    }
-  </style>
+  .card{
+    break-inside:avoid;
+    box-shadow:none;
+    border:1px solid #ccc;
+    margin-bottom:12px;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Formateurs</h1>
-      <p>Liste automatique extraite de la JSON des formations.</p>
-    </header>
 
-    <div class="tools">
-      <input id="search" type="search" placeholder="Rechercher un formateur, une matière, une langue…" />
+<div class="wrap">
 
-      <select id="filterOrg">
-        <option value="all">Tous</option>
-        <option value="UNIPOP">UniPop</option>
-        <option value="VIVRE">Vivre Ensemble</option>
-      </select>
+<header>
+  <h1>Formateurs</h1>
+  <p>Liste automatique extraite de la JSON.</p>
+</header>
 
-      <select id="sort">
-        <option value="name">Trier par nom</option>
-        <option value="courses">Trier par nombre de cours</option>
-      </select>
+<div class="tools">
 
-      <button id="printBtn">🖨️ Imprimer la liste</button>
-    </div>
+  <input
+    id="search"
+    type="search"
+    placeholder="Rechercher un formateur..."
+  />
 
-    <div class="stats">
-      <div class="stat">
-        <strong id="totalTeachers">0</strong>
-        Formateurs
-      </div>
-      <div class="stat">
-        <strong id="totalCourses">0</strong>
-        Cours analysés
-      </div>
-      <div class="stat">
-        <strong id="visibleTeachers">0</strong>
-        Résultats affichés
-      </div>
-    </div>
+  <select id="filterGroup">
+    <option value="ALL">Tous</option>
+    <option value="UNIPOP">UniPop</option>
+    <option value="AUTRES">Autres</option>
+  </select>
 
-    <main id="grid" class="grid"></main>
+  <select id="sort">
+    <option value="name">Trier par nom</option>
+    <option value="courses">Trier par nombre de cours</option>
+  </select>
 
-    <footer>
-      Données chargées depuis <code>trainings.json</code>
-    </footer>
+  <button id="printBtn">
+    🖨️ Imprimer
+  </button>
+
+</div>
+
+<div class="stats">
+
+  <div class="stat">
+    <strong id="totalTeachers">0</strong>
+    Formateurs
   </div>
 
-  <script>
-    const DATA_URL = "https://cdn.jsdelivr.net/gh/letzbug/franks_magic@f2390030c96e8fef5bd6f9d7bc7a29be2971c488/data/trainings.json";
+  <div class="stat">
+    <strong id="totalCourses">0</strong>
+    Cours
+  </div>
 
-    const grid = document.getElementById("grid");
-    const search = document.getElementById("search");
-    const sort = document.getElementById("sort");
-    const filterOrg = document.getElementById("filterOrg");
-    const printBtn = document.getElementById("printBtn");
+  <div class="stat">
+    <strong id="visibleTeachers">0</strong>
+    Résultats
+  </div>
 
-    const totalTeachers = document.getElementById("totalTeachers");
-    const totalCourses = document.getElementById("totalCourses");
-    const visibleTeachers = document.getElementById("visibleTeachers");
+</div>
 
-    let teachers = [];
-    let trainings = [];
+<main id="grid" class="grid"></main>
 
-    function clean(value){
-      return value ? String(value).trim() : "";
-    }
+<footer>
+  Données chargées depuis trainings.json
+</footer>
 
-    function fullName(t){
-      return `${clean(t.prenom)} ${clean(t.nom)}`.trim();
-    }
+</div>
 
-    function uniq(arr){
-      return [...new Set(arr.filter(Boolean))];
-    }
+<script>
 
-    function getOrganiser(course){
-      return clean(
-        course.organiser?.nom ||
-        course.organiser?.code ||
-        course.organisateurNom ||
-        course.organisateur ||
-        ""
-      );
-    }
+const DATA_URL =
+"https://cdn.jsdelivr.net/gh/letzbug/franks_magic@f2390030c96e8fef5bd6f9d7bc7a29be2971c488/data/trainings.json";
 
-    async function loadData(){
-      try{
-        const response = await fetch(DATA_URL, { cache: "no-store" });
-        if(!response.ok) throw new Error("JSON non trouvée");
+const grid = document.getElementById("grid");
+const search = document.getElementById("search");
+const sort = document.getElementById("sort");
+const filterGroup = document.getElementById("filterGroup");
+const printBtn = document.getElementById("printBtn");
 
-        trainings = await response.json();
+const totalTeachers = document.getElementById("totalTeachers");
+const totalCourses = document.getElementById("totalCourses");
+const visibleTeachers = document.getElementById("visibleTeachers");
 
-        const map = new Map();
+let trainings = [];
+let teachers = [];
 
-        trainings.forEach(course => {
-          const enseignants = Array.isArray(course.enseignants) ? course.enseignants : [];
-          const organiser = getOrganiser(course);
+function clean(v){
+  return v ? String(v).trim() : "";
+}
 
-          enseignants.forEach(enseignant => {
-            const name = fullName(enseignant);
-            if(!name) return;
+function fullName(t){
+  return `${clean(t.prenom)} ${clean(t.nom)}`.trim();
+}
 
-            const key = name.toLowerCase();
+function uniq(arr){
+  return [...new Set(arr.filter(Boolean))];
+}
 
-            if(!map.has(key)){
-              map.set(key, {
-                name,
-                prenom: clean(enseignant.prenom),
-                nom: clean(enseignant.nom),
-                presentation: clean(enseignant.presentation),
-                courses: [],
-                categories: [],
-                matieres: [],
-                langues: [],
-                formats: [],
-                organisers: []
-              });
-            }
+function getGroup(course){
+  return course.organisateur?.code === "UNIPOP"
+    ? "UNIPOP"
+    : "AUTRES";
+}
 
-            const item = map.get(key);
+async function loadData(){
 
-            item.courses.push({
-              title: clean(course.intitule),
-              date: clean(course.dateDebut),
-              matiere: clean(course.matiereNom),
-              categorie: clean(course.categorieNom),
-              langue: clean(course.langueCoursNom),
-              format: clean(course.format),
-              organiser: organiser,
-              inscrits: course.nbInscrits,
-              places: course.nbPlaces
-            });
+  try{
 
-            item.categories.push(clean(course.categorieNom));
-            item.matieres.push(clean(course.matiereNom));
-            item.langues.push(clean(course.langueCoursNom));
-            item.formats.push(clean(course.format));
-            item.organisers.push(organiser);
-          });
-        });
-
-        teachers = [...map.values()].map(t => ({
-          ...t,
-          categories: uniq(t.categories),
-          matieres: uniq(t.matieres),
-          langues: uniq(t.langues),
-          formats: uniq(t.formats),
-          organisers: uniq(t.organisers)
-        }));
-
-        render();
-      }catch(error){
-        grid.innerHTML = `
-          <div class="empty">
-            Impossible de charger la JSON.<br>
-            Erreur: <b>${escapeHtml(error.message)}</b>
-          </div>
-        `;
-        console.error(error);
-      }
-    }
-
-    function render(){
-      const q = search.value.toLowerCase().trim();
-      const org = filterOrg.value;
-
-      let filtered = teachers.filter(t => {
-        const text = [
-          t.name,
-          t.categories.join(" "),
-          t.matieres.join(" "),
-          t.langues.join(" "),
-          t.formats.join(" "),
-          t.organisers.join(" "),
-          t.courses.map(c => c.title).join(" ")
-        ].join(" ").toLowerCase();
-
-        const matchesSearch = text.includes(q);
-
-        const matchesOrg =
-          org === "all" ||
-          t.courses.some(c =>
-            String(c.organiser || "").toUpperCase().includes(org)
-          );
-
-        return matchesSearch && matchesOrg;
-      });
-
-      if(sort.value === "courses"){
-        filtered.sort((a,b) => b.courses.length - a.courses.length || a.name.localeCompare(b.name));
-      }else{
-        filtered.sort((a,b) => a.nom.localeCompare(b.nom) || a.prenom.localeCompare(b.prenom));
-      }
-
-      totalTeachers.textContent = teachers.length;
-      totalCourses.textContent = trainings.length;
-      visibleTeachers.textContent = filtered.length;
-
-      if(!filtered.length){
-        grid.innerHTML = `<div class="empty">Aucun formateur trouvé.</div>`;
-        return;
-      }
-
-      grid.innerHTML = filtered.map(t => {
-        const latestCourses = t.courses
-          .filter(c => {
-            if(org === "all") return true;
-            return String(c.organiser || "").toUpperCase().includes(org);
-          })
-          .slice(0,5)
-          .map(c => `
-            <div class="course">
-              <b>${escapeHtml(c.title)}</b><br>
-              ${escapeHtml(c.date)} · ${escapeHtml(c.matiere)} · ${escapeHtml(c.langue)}<br>
-              <small>${escapeHtml(c.organiser)}</small>
-            </div>
-          `).join("");
-
-        return `
-          <article class="card">
-            <div class="name">${escapeHtml(t.name)}</div>
-
-            <div class="meta">
-              ${t.courses.length} cours<br>
-              ${escapeHtml(t.matieres.slice(0,4).join(", "))}
-            </div>
-
-            <div class="tags">
-              ${t.organisers.map(o => `<span class="tag">${escapeHtml(o)}</span>`).join("")}
-              ${t.langues.map(l => `<span class="tag">${escapeHtml(l)}</span>`).join("")}
-            </div>
-
-            ${latestCourses}
-
-            ${t.presentation ? `
-              <div class="course">
-                <a href="${escapeAttribute(t.presentation)}" target="_blank" rel="noopener">Présentation externe</a>
-              </div>
-            ` : ""}
-          </article>
-        `;
-      }).join("");
-    }
-
-    function escapeHtml(str){
-      return String(str || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function escapeAttribute(str){
-      return escapeHtml(str).replaceAll("`","");
-    }
-
-    search.addEventListener("input", render);
-    sort.addEventListener("change", render);
-    filterOrg.addEventListener("change", render);
-
-    printBtn.addEventListener("click", () => {
-      window.print();
+    const response = await fetch(DATA_URL,{
+      cache:"no-store"
     });
 
-    loadData();
-  </script>
+    trainings = await response.json();
+
+    const map = new Map();
+
+    trainings.forEach(course => {
+
+      const enseignants =
+        Array.isArray(course.enseignants)
+          ? course.enseignants
+          : [];
+
+      const group = getGroup(course);
+
+      enseignants.forEach(enseignant => {
+
+        const name = fullName(enseignant);
+
+        if(!name) return;
+
+        const key = name.toLowerCase();
+
+        if(!map.has(key)){
+
+          map.set(key,{
+            name,
+            prenom:clean(enseignant.prenom),
+            nom:clean(enseignant.nom),
+
+            courses:[],
+            matieres:[],
+            langues:[],
+            formats:[],
+            groups:[]
+          });
+
+        }
+
+        const item = map.get(key);
+
+        item.courses.push({
+          title:clean(course.intitule),
+          date:clean(course.dateDebut),
+          matiere:clean(course.matiereNom),
+          langue:clean(course.langueCoursNom),
+          format:clean(course.format),
+          group
+        });
+
+        item.matieres.push(clean(course.matiereNom));
+        item.langues.push(clean(course.langueCoursNom));
+        item.formats.push(clean(course.format));
+        item.groups.push(group);
+
+      });
+
+    });
+
+    teachers = [...map.values()].map(t => ({
+      ...t,
+      matieres:uniq(t.matieres),
+      langues:uniq(t.langues),
+      formats:uniq(t.formats),
+      groups:uniq(t.groups)
+    }));
+
+    render();
+
+  }catch(error){
+
+    grid.innerHTML = `
+      <div class="empty">
+        Impossible de charger la JSON.<br>
+        ${error.message}
+      </div>
+    `;
+
+    console.error(error);
+
+  }
+
+}
+
+function render(){
+
+  const q =
+    search.value.toLowerCase().trim();
+
+  const group =
+    filterGroup.value;
+
+  let filtered = teachers.filter(t => {
+
+    const text = [
+
+      t.name,
+      t.matieres.join(" "),
+      t.langues.join(" "),
+      t.formats.join(" ")
+
+    ].join(" ").toLowerCase();
+
+    const matchesSearch =
+      text.includes(q);
+
+    const matchesGroup =
+
+      group === "ALL"
+
+      ||
+
+      t.groups.includes(group);
+
+    return matchesSearch && matchesGroup;
+
+  });
+
+  if(sort.value === "courses"){
+
+    filtered.sort((a,b)=>
+      b.courses.length - a.courses.length
+    );
+
+  }else{
+
+    filtered.sort((a,b)=>
+      a.nom.localeCompare(b.nom)
+    );
+
+  }
+
+  totalTeachers.textContent =
+    teachers.length;
+
+  totalCourses.textContent =
+    trainings.length;
+
+  visibleTeachers.textContent =
+    filtered.length;
+
+  if(!filtered.length){
+
+    grid.innerHTML = `
+      <div class="empty">
+        Aucun résultat.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  grid.innerHTML = filtered.map(t => {
+
+    const courses = t.courses
+
+      .filter(c => {
+
+        if(group === "ALL")
+          return true;
+
+        return c.group === group;
+
+      })
+
+      .slice(0,5)
+
+      .map(c => `
+
+        <div class="course">
+
+          <b>${escapeHtml(c.title)}</b><br>
+
+          ${escapeHtml(c.date)}
+          ·
+          ${escapeHtml(c.matiere)}
+          ·
+          ${escapeHtml(c.langue)}
+
+        </div>
+
+      `).join("");
+
+    return `
+
+      <article class="card">
+
+        <div class="name">
+          ${escapeHtml(t.name)}
+        </div>
+
+        <div class="meta">
+          ${t.courses.length} cours<br>
+          ${escapeHtml(
+            t.matieres.slice(0,4).join(", ")
+          )}
+        </div>
+
+        <div class="tags">
+
+          ${t.groups.map(g => `
+            <span class="tag">
+              ${escapeHtml(g)}
+            </span>
+          `).join("")}
+
+          ${t.langues.map(l => `
+            <span class="tag">
+              ${escapeHtml(l)}
+            </span>
+          `).join("")}
+
+        </div>
+
+        ${courses}
+
+      </article>
+
+    `;
+
+  }).join("");
+
+}
+
+function escapeHtml(str){
+
+  return String(str || "")
+
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+search.addEventListener("input",render);
+sort.addEventListener("change",render);
+filterGroup.addEventListener("change",render);
+
+printBtn.addEventListener("click",()=>{
+  window.print();
+});
+
+loadData();
+
+</script>
+
 </body>
 </html>
